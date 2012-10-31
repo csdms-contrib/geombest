@@ -18,7 +18,7 @@ global zcentroids;
 global celldim;
 global SL;
 
-close all
+ close all
 
 % load the grid representation of the tract from the hard-drive
 
@@ -82,9 +82,9 @@ for s = 2:S + 1
     if strcmp(strat(j,s).name,'active sand body')
         tractcolor(s + 1,:) = [1,1,0]; % yellow
     elseif strcmp(strat(j,s).name,'estuary')
-        tractcolor(s + 1,:) = [.75,0.75,.16]; % orange
+        tractcolor(s + 1,:) = [0.35,0.35,.35]; % grey
     elseif strcmp(strat(j,s).name,'strat1')
-        tractcolor(s + 1,:) = [0.35,0.35,.35]; % grey    
+        tractcolor(s + 1,:) = [.75,0.75,.16]; % orange    
     elseif strcmp(strat(j,s).name,'strat2')
         tractcolor(s + 1,:) = [.68,0.58,.16]; % brown
     elseif strcmp(strat(j,s).name,'strat3')

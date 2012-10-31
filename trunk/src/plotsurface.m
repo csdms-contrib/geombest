@@ -25,10 +25,10 @@ end
 load(filename)
 
 %load modern surface file
-modsurf = xlsread('modern_surface_CI_from_shifted_70000', 'Sheet1', 'a1:b5483', 'basic');
+modsurf = xlsread('ModernSurface', 'Sheet1', 'a1:b5483', 'basic');
 
 %assign variables for the modern surface
-modx = modsurf (:,1);
+modx = modsurf (:,1)/1000; % Convert from meters to kilometers
 mody = modsurf (:,2);
 
 close all
@@ -47,9 +47,9 @@ else
     error('Not Unix, Not PC!')
 end
 
-load(filename2)
+load(filename2);
 
-x = xcentroids(1,:); %create variable of xcentroids = distance
+x = xcentroids(1,:)/1000; %create variable of xcentroids = distance and convert to km
 
 % Calculate average depth of erosion at three distances
 %dist1 = A ; %sets up a counter for first distance
@@ -103,9 +103,9 @@ hold on
 %text(135000,-40,['Average Depth of Erosion =' num2str(AveEdepth) ' m'], 'fontsize', 15);
 
 %key for color lines
-text(95000,-15,['Initial Surface' ], 'fontsize', 15, 'color', 'b');
-text(95000,-18,['Model-generated Surface'], 'fontsize', 15, 'color', 'r');
-text(95000,-21,['~1920'], 'fontsize', 15, 'color', 'k');
+text(95,-15,'Initial Surface', 'fontsize', 15, 'color', 'b');
+text(95,-22,'Model-generated Surface', 'fontsize', 15, 'color', 'r');
+text(95,-29,'Modern Surface', 'fontsize', 15, 'color', 'k');
 
 %set the dimensions of the plot so that it is longer in the x direction
 %than in the y direction 
