@@ -1,13 +1,15 @@
-function plotblackwhite (filethread,t,j,fir,incr)
+function plotblackwhite (filethread,t,j,fir,incr,modelrun)
 
-% plotblackwhite -- plots a raster representation of the tract, superimposed with a surface line,for 
-% a particular filethread t = time, j = tract number, fir = the first shadow surface to plot, and
-% incr = the number of timesteps between each plotted shadow barrier  
+% plottract -- plots a raster representation of the tract, superimposed with a surface line  
+% t = last time step, j = tract number, fir = the first shadow surface to plot, incr = the number of timesteps 
+% between each plotted shadow barrier, modelrun=the title of the model run to be printed as the title 
+% of the plot. Modelrun input argument must be placed in single quotes. See
+% users guide for details.
 
 % Dr David Stolper dstolper@usgs.gov
 
-% Version of 28-Aug-2003 14:44
-% Updated    28-Aug-2003 14:44
+% Version of 27-Dec-2002 16:16
+% Updated    15-Apr-2003 11:32
 
 global strat;
 global surface;
@@ -16,11 +18,13 @@ global zcentroids;
 global celldim;
 global SL;
 
+ close all
+
 % load the grid representation of the tract from the hard-drive
 
 n = int2str(t); while length(n)<4, n = ['0' n]; end
 varname = ['step_' n];
-filename = ['C:\Geombest\Output' num2str(filethread) '\' varname '.mat'];
+filename = ['C:\GEOMBEST\Output' num2str(filethread) '\' varname '.mat'];
 temp = load (filename , varname);
 eval (['gridtimestep =  temp.' varname ';']);
 
@@ -31,7 +35,7 @@ S = size(gridtimestep,5);
 
 % load global variables from the hard-drive if they exist 
 
-dirname = ['C:\Quicksand\Output' num2str(filethread) '\'];
+dirname = ['C:\GEOMBEST\Output' num2str(filethread) '\'];
 
 if exist([dirname 'surface.mat']) == 2
     load ([dirname 'surface.mat'])
@@ -71,8 +75,8 @@ overallmaxz = max(maxz); % determines the overall maximum z value
 
 % create tractcolor colormap
 
-tractcolor(1,:) = [1,1,1]; % white (sky)
-tractcolor(2,:) = [1,1,1]; % white (water)
+tractcolor(1,:) = [1,1,1]; % white
+tractcolor(2,:) = [1,1,1]; % white
 
 for s = 2:S + 1
     if strcmp(strat(j,s).name,'active sand body')
@@ -80,15 +84,17 @@ for s = 2:S + 1
     elseif strcmp(strat(j,s).name,'estuary')
         tractcolor(s + 1,:) = [0.5,0.5,0.5]; % dark-grey
     elseif strcmp(strat(j,s).name,'strat1')
-        tractcolor(s + 1,:) = [0,0,0]; % black    
+        tractcolor(s + 1,:) = [1,1,1]; % white    
     elseif strcmp(strat(j,s).name,'strat2')
-        tractcolor(s + 1,:) = [1,0,1]; % magenta
+         tractcolor(s + 1,:) = [1,1,1]; % white %%% DW -Strat 2 Color set to same as strat 1 because they are the same unit separated into two for plotting purposes.         
+%     elseif strcmp(strat(j,s).name,'strat2')
+%         tractcolor(s + 1,:) = [0.87,0.87,0.87]; % grey
     elseif strcmp(strat(j,s).name,'strat3')
-        tractcolor(s + 1,:) = [0,1,1]; % cyan
+        tractcolor(s + 1,:) = [0.63,0.63,0.63]; % lighter grey
     elseif strcmp(strat(j,s).name,'strat4')
-        tractcolor(s + 1,:) = [0.5,0.5,0.5]; % grey
+        tractcolor(s + 1,:) = [0.38,0.38,0.38]; % light-grey
     elseif strcmp(strat(j,s).name,'strat5')
-        tractcolor(s + 1,:) = [0.5,0,0]; % dark red
+        tractcolor(s + 1,:) = [.26,.26,.26]; % darker grey
     end
 end
 
@@ -131,8 +137,9 @@ end
 
 % determines maximum and minimum values for display
 
-xmin = min(xcentroids) - celldim(1,j) ./ 2;
-xmax = max(xcentroids) + celldim(1,j) ./ 2;
+xcentroids = xcentroids/1000;   % LJM 3/22/06: divide by 1000 to put in km
+xmin = min(xcentroids) - celldim(1,j)/1000 ./ 2;  %LJM 3/22/06 : add divide by 1000 to change cell dim to m
+xmax = max(xcentroids) + celldim(1,j)/1000 ./ 2;  %LJM 3/22/06 : add divide by 1000 to change cell dim to m
 zmin = min(zcentroids) - celldim(3,j) ./ 2;
 zmax = max(zcentroids) + celldim(3,j) ./ 2;
 
@@ -152,15 +159,20 @@ zeds = squeeze(surface(t,:,j));
 plot1 = plot (xcentroids,zeds,'linewidth',1.5); % plot surface at step t
     
 set(plot1,'Color',[0,0,0]);
-xlabel('distance (km)','FontSize',10);
-ylabel('elevation relative to initial sea level (m)','FontSize',10);    
+xlabel('Distance (km)','FontSize',14);
+ylabel('Elevation Relative to Initial Sea Level (m)','FontSize',14);    
+set (gca, 'fontsize', 14,...
+    'yminortick','on',...
+    'xminortick','on',...
+    'TickDir','out',...
+    'XDir','reverse')
+title((modelrun), 'fontsize', 15)
 
-% plot figure border
-
-x = [xmin,xmax,xmax,xmin,xmin];
-y = [zmin,zmin,zmax,zmax,zmin];
-plot1 = plot(x,y);
-set(plot1,'Color',[0,0,0],'linewidth',1.5);
+%set the dimensions of the plot so that it is longer in the x direction
+%than in the y direction 
+h= gcf;
+x = get (h, 'position');
+set (h, 'position', [x(1), x(2), 800, 400]); % 1st two numbers are location of plot, 3rd is x length, 4th is y length.
 
 % plot initial sea level
 
@@ -177,3 +189,9 @@ plot1 = plot(x,y,'--');
 set(plot1,'Color',[0,0,0]);
 
 hold off;
+outputfilename = ['../Output' num2str(filethread) '/pblackwhite' num2str(modelrun)];
+
+%print('-dill',outputfilename)- isn't including grayscale
+saveas(plot1, ['../Output' num2str(filethread) '/pblackwhite' num2str(modelrun) '.fig'])
+print('-dpdf',outputfilename)
+print('-djpeg', outputfilename)

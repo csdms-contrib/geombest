@@ -1,4 +1,4 @@
-function plotblackwhite2 (filethread,t,j,fir,incr)
+function plotblackwhite2 (filethread,t,j,fir,incr,modelrun)
 
 % plotblackwhite -- plots a raster representation of the tract, superimposed with a surface line,for 
 % a particular filethread t = time, j = tract number, fir = the first shadow surface to plot, and
@@ -20,7 +20,7 @@ global SL;
 
 n = int2str(t); while length(n)<4, n = ['0' n]; end
 varname = ['step_' n];
-filename = ['C:\Quicksand\Output' num2str(filethread) '\' varname '.mat'];
+filename = ['C:\GEOMBEST\Output' num2str(filethread) '\' varname '.mat'];
 temp = load (filename , varname);
 eval (['gridtimestep =  temp.' varname ';']);
 
@@ -154,6 +154,7 @@ plot1 = plot (xcentroids,zeds,'linewidth',2.0); % plot surface at step t
 set(plot1,'Color',[0,0,0]);
 xlabel('distance (km)','FontSize',10);
 ylabel('elevation relative to initial sea level (m)','FontSize',10);    
+title((modelrun), 'fontsize', 15);
 
 % plot figure border
 
